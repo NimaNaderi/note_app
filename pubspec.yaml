@@ -39,6 +39,10 @@ dependencies:
   hive_flutter: ^1.1.0
   msh_checkbox: ^2.0.0
   flutter_screenutil: ^5.6.1
+  animated_toggle_switch: ^0.6.1
+  motion_toast: ^2.6.4
+  navigation_history_observer: ^1.1.0
+  time_pickerr: ^1.0.6
 
 dev_dependencies:
   build_runner: ^2.3.3

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:navigation_history_observer/navigation_history_observer.dart';
 import 'package:todo/add_task_screen.dart';
 import 'package:todo/home_screen.dart';
 import 'package:todo/task.dart';
+import 'package:todo/test_screen.dart';
 
 void main() async {
   await Hive.initFlutter();
@@ -18,6 +20,8 @@ class MyApplication extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      navigatorObservers: [NavigationHistoryObserver()],
       theme: ThemeData(
         fontFamily: 'SM',
         textTheme: TextTheme(

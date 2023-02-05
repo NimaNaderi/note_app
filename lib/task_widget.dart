@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:msh_checkbox/msh_checkbox.dart';
+import 'package:todo/edit_task_screen.dart';
 import 'package:todo/task.dart';
 
 class TaskWidget extends StatefulWidget {
@@ -18,8 +19,7 @@ class _TaskWidgetState extends State<TaskWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    isBoxChecked = widget.task.isDone;
+    // isBoxChecked = widget.task.isDone;
   }
 
   @override
@@ -28,6 +28,8 @@ class _TaskWidgetState extends State<TaskWidget> {
   }
 
   Widget _getTaskItem() {
+    isBoxChecked = widget.task.isDone;
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -123,7 +125,14 @@ class _TaskWidgetState extends State<TaskWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             child: Row(
               children: [
-                Text('10:30'),
+                Text(
+                  '${_getHourUnderTen(widget.task.time)}:${_getMinuteUnderTen(widget.task.time)}',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                  ),
+                ),
                 SizedBox(
                   width: 8,
                 ),
@@ -135,34 +144,49 @@ class _TaskWidgetState extends State<TaskWidget> {
         SizedBox(
           width: 16,
         ),
-        Container(
-          width: 90,
-          height: 28,
-          decoration: BoxDecoration(
-            color: Color(0xffE2F6F1),
-            borderRadius: BorderRadius.circular(18),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
+        InkWell(
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => EditTaskScreen(
+                task: widget.task,
+              ),
+            ));
+          },
+          child: Container(
+            width: 90,
+            height: 28,
+            decoration: BoxDecoration(
+              color: Color(0xffE2F6F1),
+              borderRadius: BorderRadius.circular(18),
             ),
-            child: Row(
-              children: [
-                Text(
-                  'ویرایش',
-                  style: TextStyle(
-                    color: Color(0xff18DAA3),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    'ویرایش',
+                    style: TextStyle(
+                      color: Color(0xff18DAA3),
+                    ),
                   ),
-                ),
-                SizedBox(
-                  width: 6,
-                ),
-                Image.asset('assets/images/icon_edit.png'),
-              ],
+                  SizedBox(
+                    width: 6,
+                  ),
+                  Image.asset('assets/images/icon_edit.png'),
+                ],
+              ),
             ),
           ),
         ),
       ],
     );
   }
+
+  String _getMinuteUnderTen(DateTime time) =>
+      time.minute < 10 ? '0${time.minute}' : time.minute.toString();
+
+  String _getHourUnderTen(DateTime time) =>
+      time.hour < 10 ? '0${time.hour}' : time.hour.toString();
 }

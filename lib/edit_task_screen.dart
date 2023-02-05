@@ -1,24 +1,29 @@
+import 'dart:math';
+
+import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:motion_toast/motion_toast.dart';
 import 'package:time_pickerr/time_pickerr.dart';
 import 'package:todo/task.dart';
 
-class AddTaskScreen extends StatefulWidget {
-  const AddTaskScreen({super.key});
+class EditTaskScreen extends StatefulWidget {
+  EditTaskScreen({super.key, required this.task});
+  Task task;
 
   @override
-  State<AddTaskScreen> createState() => _AddTaskScreenState();
+  State<EditTaskScreen> createState() => _EditTaskScreenState();
 }
 
-class _AddTaskScreenState extends State<AddTaskScreen> {
+class _EditTaskScreenState extends State<EditTaskScreen> {
   FocusNode focusNode1 = FocusNode();
   FocusNode focusNode2 = FocusNode();
 
-  final TextEditingController taskTitleController = TextEditingController();
-  final TextEditingController taskSubTitleController = TextEditingController();
+  TextEditingController? taskTitleController;
+  TextEditingController? taskSubTitleController;
 
   final taskBox = Hive.box<Task>('taskBox');
+
+  bool? isDone;
 
   DateTime? _time;
 
@@ -26,6 +31,13 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    _time = widget.task.time;
+
+    taskTitleController = TextEditingController(text: widget.task.title);
+    taskSubTitleController = TextEditingController(text: widget.task.subTitle);
+    isDone = widget.task.isDone;
+
     focusNode1.addListener(() {
       setState(() {});
     });
@@ -116,12 +128,60 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 ),
               ),
             ),
+            SizedBox(
+              height: 30,
+            ),
+            AnimatedToggleSwitch<bool>.dual(
+              first: true,
+              second: false,
+              current: isDone!,
+              iconBuilder: (value) {
+                if (isDone!) {
+                  return Container(
+                    child: Icon(
+                      Icons.done,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Color(0xff18DAA3),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  );
+                } else
+                  return Container(
+                    child: Icon(
+                      Icons.history,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Color(0xff18DAA3),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  );
+              },
+              indicatorSize: Size.fromWidth(50),
+              borderColor: Color(0xff18DAA3),
+              borderWidth: 3,
+              colorBuilder: (value) => Colors.white,
+              onChanged: (p0) {
+                setState(() {
+                  isDone = p0;
+                });
+              },
+              animationDuration: Duration(milliseconds: 500),
+              animationCurve: Curves.easeInOut,
+            ),
             Directionality(
               textDirection: TextDirection.rtl,
               child: CustomHourPicker(
-                title: 'زمان تسک را انتخاب کن',
-                negativeButtonText: 'حذف کن',
-                positiveButtonText: 'انتخاب زمان',
+                date: _time,
+                title: 'زمان تسک را تغییر دهید',
+                negativeButtonText: 'زمان پیشفرض',
+                positiveButtonText: 'تغییر زمان',
                 elevation: 2,
                 titleStyle: TextStyle(
                     color: Color(0xff18DAA3),
@@ -136,14 +196,10 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     fontWeight: FontWeight.bold,
                     fontSize: 18),
                 onPositivePressed: (context, time) {
-                  setState(() {
-                    _time = time;
-                  });
+                  _time = time;
                 },
                 onNegativePressed: (context) {
-                  setState(() {
-                    _time = null;
-                  });
+                  _time = widget.task.time;
                 },
               ),
             ),
@@ -154,37 +210,27 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                 minimumSize: Size(200, 48),
               ),
               onPressed: () {
-                if (taskTitleController.value.text.length == 0 &&
-                    taskSubTitleController.value.text.length == 0) {
-                  MotionToast.error(
-                    description: Text('! عنوان یا توضیحات تسک نباید خالی باشه'),
-                    barrierColor: Colors.red.withOpacity(.2),
-                  ).show(context);
-                  return;
-                }
-                var taskTitle = taskTitleController.text;
-                var taskSubTitle = taskSubTitleController.text;
-                addTask(taskTitle, taskSubTitle);
-                Navigator.of(context).pop('َAdded');
+                var taskTitle = taskTitleController!.text;
+                var taskSubTitle = taskSubTitleController!.text;
+                editTask(taskTitle, taskSubTitle);
+                Navigator.of(context).pop();
               },
               child: Text(
-                _time == null
-                    ? 'لطفا زمان تسک را انتخاب کنید'
-                    : 'اضافه کردن تسک',
+                'ویرایش کردن تسک',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
+            )
           ],
         )),
       ),
     );
   }
 
-  addTask(String taskTitle, String taskSubTitle) {
-    var task = Task(title: taskTitle, subTitle: taskSubTitle, time: _time!);
-    taskBox.add(task);
+  editTask(String taskTitle, String taskSubTitle) {
+    widget.task.title = taskTitle;
+    widget.task.subTitle = taskSubTitle;
+    widget.task.isDone = isDone!;
+    widget.task.time = _time!;
+    widget.task.save();
   }
 }
