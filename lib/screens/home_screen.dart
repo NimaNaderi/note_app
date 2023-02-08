@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:motion_toast/motion_toast.dart';
-import 'package:todo/add_task_screen.dart';
-import 'package:todo/task.dart';
-import 'package:todo/task_widget.dart';
+import 'package:todo/widgets/task_widget.dart';
+
+import '../data/model/task.dart';
+import 'add_task_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

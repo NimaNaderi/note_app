@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:msh_checkbox/msh_checkbox.dart';
-import 'package:todo/edit_task_screen.dart';
-import 'package:todo/task.dart';
+
+import '../data/model/task.dart';
+import '../screens/edit_task_screen.dart';
+
 
 class TaskWidget extends StatefulWidget {
   TaskWidget({super.key, required this.task});
@@ -65,21 +67,24 @@ class _TaskWidgetState extends State<TaskWidget> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  MSHCheckbox(
-                    size: 32,
-                    colorConfig: MSHColorConfig(
-                      checkColor: (p0) => Colors.white,
-                      fillColor: (p0) => Color(0xff18DAA3),
+                  Transform.scale(
+                    scale: 1.1,
+                    child: MSHCheckbox(
+                      size: 32,
+                      colorConfig: MSHColorConfig(
+                        checkColor: (p0) => Colors.white,
+                        fillColor: (p0) => Color(0xff18DAA3),
+                      ),
+                      style: MSHCheckboxStyle.fillScaleColor,
+                      value: isBoxChecked,
+                      onChanged: (selected) {
+                        setState(() {
+                          isBoxChecked = selected;
+                          widget.task.isDone = isBoxChecked;
+                          widget.task.save();
+                        });
+                      },
                     ),
-                    style: MSHCheckboxStyle.fillScaleColor,
-                    value: isBoxChecked,
-                    onChanged: (selected) {
-                      setState(() {
-                        isBoxChecked = selected;
-                        widget.task.isDone = isBoxChecked;
-                        widget.task.save();
-                      });
-                    },
                   ),
                   // Checkbox(
                   //     value: isBoxChecked,
@@ -106,7 +111,7 @@ class _TaskWidgetState extends State<TaskWidget> {
         SizedBox(
           width: 20,
         ),
-        Image.asset('assets/images/workout.png'),
+        Image.asset(widget.task.taskType.image),
       ],
     );
   }
@@ -164,6 +169,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 horizontal: 12,
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
                     'ویرایش',
